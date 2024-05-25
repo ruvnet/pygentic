@@ -3,11 +3,13 @@ from app.models import Thread, ThreadDB
 
 router = APIRouter()
 
+
 @router.post("/threads", response_model=Thread)
 async def create_thread(thread: Thread):
     thread_db = ThreadDB(**thread.dict())
     await thread_db.save()
     return thread
+
 
 @router.get("/threads/{thread_id}", response_model=Thread)
 async def get_thread(thread_id: str):

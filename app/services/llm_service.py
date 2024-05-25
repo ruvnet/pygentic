@@ -1,6 +1,7 @@
 from app.models import Assistant, Thread, Message, Run
 from liteLLM import LLMClient
 
+
 class LLMService:
     client = LLMClient(api_key="your_api_key")
 
@@ -10,7 +11,7 @@ class LLMService:
             name=assistant.name,
             model=assistant.model,
             instructions=assistant.instructions,
-            tools=assistant.tools
+            tools=assistant.tools,
         )
         return response
 
@@ -22,8 +23,7 @@ class LLMService:
     @staticmethod
     async def create_thread(thread: Thread):
         response = await LLMService.client.create_thread(
-            assistant_id=thread.assistant_id,
-            messages=thread.messages
+            assistant_id=thread.assistant_id, messages=thread.messages
         )
         return response
 
@@ -35,9 +35,7 @@ class LLMService:
     @staticmethod
     async def add_message(thread_id: str, message: Message):
         response = await LLMService.client.add_message(
-            thread_id=thread_id,
-            role=message.role,
-            content=message.content
+            thread_id=thread_id, role=message.role, content=message.content
         )
         return response
 
@@ -49,8 +47,7 @@ class LLMService:
     @staticmethod
     async def run_thread(thread_id: str, run: Run):
         response = await LLMService.client.run_thread(
-            thread_id=thread_id,
-            assistant_id=run.assistant_id
+            thread_id=thread_id, assistant_id=run.assistant_id
         )
         return response
 

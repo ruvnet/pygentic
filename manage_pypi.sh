@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Function to display the menu
+# Function to display the main menu
 show_menu() {
     clear
     echo "***********************************"
@@ -12,7 +12,21 @@ show_menu() {
     echo "4. Increment version number (patch)"
     echo "5. Increment version number (minor)"
     echo "6. Increment version number (major)"
-    echo "7. Exit"
+    echo "7. Advanced options"
+    echo "8. Exit"
+}
+
+# Function to display the advanced menu
+show_advanced_menu() {
+    clear
+    echo "***********************************"
+    echo "*        Advanced Options         *"
+    echo "***********************************"
+    echo "1. Create/update .github workflow"
+    echo "2. Run tests using Pytest"
+    echo "3. Lint and format code"
+    echo "4. Check and update dependencies"
+    echo "5. Back to main menu"
 }
 
 # Function to clean old distributions
@@ -58,7 +72,7 @@ increment_version() {
 # Function to check if required Python packages are installed
 check_packages() {
     echo "🔍 Checking required Python packages..."
-    required_packages=("twine" "setuptools" "wheel")
+    required_packages=("twine" "setuptools" "wheel" "flake8" "black" "pytest" "pip-upgrader")
     for package in "${required_packages[@]}"; do
         if ! pip show "$package" > /dev/null 2>&1; then
             echo "⚠️  Package $package is not installed. Installing..."
@@ -85,41 +99,146 @@ check_env_vars() {
     done
 }
 
+# Function to create or update .github workflow
+create_update_workflow() {
+    mkdir -p .github/workflows
+    cat > .github/workflows/python-package.yml <<EOL
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 .
+    - name: Test with pytest
+      run: |
+        pytest
+EOL
+    echo "⚙️  GitHub workflow created/updated."
+}
+
+# Function to run tests using Pytest
+run_tests() {
+    pytest
+    echo "✅ Tests completed."
+}
+
+# Function to lint and format code
+lint_format_code() {
+    flake8 .
+    black .
+    echo "✅ Code linted and formatted."
+}
+
+# Function to check and update dependencies
+check_update_dependencies() {
+    if [[ -z "$VIRTUAL_ENV" ]]; then
+        echo "⚠️  It seems you haven't activated a virtualenv."
+        read -p "Do you want to skip the virtualenv check and install packages anyway? (y/n): " choice
+        if [[ "$choice" != "y" ]]; then
+            echo "❌ Dependency check canceled. Please activate your virtualenv."
+            return
+        fi
+    fi
+    pip-upgrade
+    echo "✅ Dependencies checked and updated."
+}
+
 # Main loop to display menu and handle user input
-while true; do
+initial_checks() {
     check_packages
     check_env_vars
-    show_menu
-    read -p "Select an option: " choice
+}
 
-    case $choice in
-        1)
-            clean_dists
-            ;;
-        2)
-            build_dists
-            ;;
-        3)
-            upload_dists
-            ;;
-        4)
-            increment_version patch
-            ;;
-        5)
-            increment_version minor
-            ;;
-        6)
-            increment_version major
-            ;;
-        7)
-            echo "Goodbye! 👋"
-            exit 0
-            ;;
-        *)
-            echo "❌ Invalid option, please try again."
-            ;;
-    esac
+main_menu() {
+    while true; do
+        show_menu
+        read -p "Select an option: " choice
 
-    echo -e "\nPress any key to continue..."
-    read -n 1
-done
+        case $choice in
+            1)
+                clean_dists
+                ;;
+            2)
+                build_dists
+                ;;
+            3)
+                upload_dists
+                ;;
+            4)
+                increment_version patch
+                ;;
+            5)
+                increment_version minor
+                ;;
+            6)
+                increment_version major
+                ;;
+            7)
+                advanced_menu
+                ;;
+            8)
+                echo "Goodbye! 👋"
+                exit 0
+                ;;
+            *)
+                echo "❌ Invalid option, please try again."
+                ;;
+        esac
+
+        echo -e "\nPress any key to continue..."
+        read -n 1
+    done
+}
+
+advanced_menu() {
+    while true; do
+        show_advanced_menu
+        read -p "Select an advanced option: " adv_choice
+        case $adv_choice in
+            1)
+                create_update_workflow
+                ;;
+            2)
+                run_tests
+                ;;
+            3)
+                lint_format_code
+                ;;
+            4)
+                check_update_dependencies
+                ;;
+            5)
+                return
+                ;;
+            *)
+                echo "❌ Invalid option, please try again."
+                ;;
+        esac
+        echo -e "\nPress any key to continue..."
+        read -n 1
+    done
+}
+
+# Run initial checks once
+initial_checks
+
+# Start main menu
+main_menu
