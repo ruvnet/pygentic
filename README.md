@@ -1,5 +1,4 @@
-```
-   ___                      _   _      
+```   ___                      _   _      
   / _ \/\_/\__ _  ___ _ __ | |_(_) ___ 
  / /_)/\_ _/ _` |/ _ \ '_ \| __| |/ __|
 / ___/  / \ (_| |  __/ | | | |_| | (__ 
@@ -92,7 +91,7 @@ pip install pygentic
 After installing the library, you can run the application using the following command:
 
 ```bash
-uvicorn app.main:app --reload
+pygentic
 ```
 
 ## Endpoints
@@ -112,5 +111,4 @@ uvicorn app.main:app --reload
 ### Runs
 - `POST /v1/threads/{thread_id}/runs`: Run a thread with an assistant.
 - `GET /v1/threads/{thread_id}/runs/{run_id}`: Retrieve a run by ID.
-```
  

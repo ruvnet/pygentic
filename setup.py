@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='pygentic',
-    version='0.1.2',  # Incremented version number
+    version='0.2.0',
     packages=find_packages(),
     install_requires=[
         'fastapi',
@@ -22,7 +22,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'pygentic=pygentic.__main__:main',
+            'pygentic=app.main:run'
         ],
     },
     author='Your Name',
