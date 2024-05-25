@@ -13,7 +13,8 @@ show_menu() {
     echo "5. Increment version number (minor)"
     echo "6. Increment version number (major)"
     echo "7. Advanced options"
-    echo "8. Exit"
+    echo "8. Help"
+    echo "9. Exit"
 }
 
 # Function to display the advanced menu
@@ -26,7 +27,39 @@ show_advanced_menu() {
     echo "2. Run tests using Pytest"
     echo "3. Lint and format code"
     echo "4. Check and update dependencies"
-    echo "5. Back to main menu"
+    echo "5. Generate start command"
+    echo "6. Back to main menu"
+}
+
+# Function to display the help dialog
+show_help() {
+    clear
+    echo "***********************************"
+    echo "*           Help Overview         *"
+    echo "***********************************"
+    echo "This tool provides various options to manage your PyPI package:"
+    echo ""
+    echo "Main Menu Options:"
+    echo "1. Clean old distributions: Removes old distribution files."
+    echo "2. Build new distributions: Builds new distribution files (source and wheel)."
+    echo "3. Upload distributions to PyPI: Uploads the built distributions to PyPI."
+    echo "4. Increment version number (patch): Increments the patch version number."
+    echo "5. Increment version number (minor): Increments the minor version number."
+    echo "6. Increment version number (major): Increments the major version number."
+    echo "7. Advanced options: Provides advanced management options."
+    echo "8. Help: Displays this help overview."
+    echo "9. Exit: Exits the tool."
+    echo ""
+    echo "Advanced Menu Options:"
+    echo "1. Create/update .github workflow: Creates or updates a GitHub Actions workflow."
+    echo "2. Run tests using Pytest: Runs tests using Pytest."
+    echo "3. Lint and format code: Lints and formats code using flake8 and black."
+    echo "4. Check and update dependencies: Checks and updates package dependencies."
+    echo "5. Generate start command: Generates a start command for your library."
+    echo "6. Back to main menu: Returns to the main menu."
+    echo ""
+    echo -e "Press any key to return to the main menu..."
+    read -n 1
 }
 
 # Function to clean old distributions
@@ -161,6 +194,17 @@ check_update_dependencies() {
     echo "✅ Dependencies checked and updated."
 }
 
+# Function to generate a start command
+generate_start_command() {
+    read -p "Enter the name for the command (e.g., mycommand): " command_name
+    read -p "Enter the command to execute (e.g., python3 main.py): " command_exec
+
+    # Add the entry point to setup.py
+    sed -i "/entry_points=/a \        '$command_name=$command_exec'," setup.py
+
+    echo "🔧 Start command '$command_name' added. To use it, reinstall the package."
+}
+
 # Main loop to display menu and handle user input
 initial_checks() {
     check_packages
@@ -195,6 +239,9 @@ main_menu() {
                 advanced_menu
                 ;;
             8)
+                show_help
+                ;;
+            9)
                 echo "Goodbye! 👋"
                 exit 0
                 ;;
@@ -226,6 +273,9 @@ advanced_menu() {
                 check_update_dependencies
                 ;;
             5)
+                generate_start_command
+                ;;
+            6)
                 return
                 ;;
             *)
