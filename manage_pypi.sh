@@ -18,18 +18,19 @@ show_menu() {
 # Function to clean old distributions
 clean_dists() {
     rm -rf dist/*
-    echo "Old distributions cleaned."
+    echo "🗑️  Old distributions cleaned."
 }
 
 # Function to build new distributions
 build_dists() {
     python setup.py sdist bdist_wheel
-    echo "New distributions built."
+    echo "📦 New distributions built."
 }
 
 # Function to upload distributions to PyPI
 upload_dists() {
     twine upload dist/*
+    echo "🚀 Distributions uploaded to PyPI."
 }
 
 # Function to increment version number
@@ -51,11 +52,43 @@ increment_version() {
 
     new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
     sed -i "s/version='[0-9]\+\.[0-9]\+\.[0-9]\+'/version='$new_version'/" setup.py
-    echo "Version incremented to $new_version."
+    echo "🔢 Version incremented to $new_version."
+}
+
+# Function to check if required Python packages are installed
+check_packages() {
+    echo "🔍 Checking required Python packages..."
+    required_packages=("twine" "setuptools" "wheel")
+    for package in "${required_packages[@]}"; do
+        if ! pip show "$package" > /dev/null 2>&1; then
+            echo "⚠️  Package $package is not installed. Installing..."
+            pip install "$package"
+            echo "✅ Package $package installed."
+        else
+            echo "✅ Package $package is already installed."
+        fi
+    done
+}
+
+# Function to check if required environment variables are set
+check_env_vars() {
+    echo "🔍 Checking required environment variables..."
+    required_vars=("TWINE_USERNAME" "TWINE_PASSWORD")
+    for var in "${required_vars[@]}"; do
+        if [ -z "${!var}" ]; then
+            read -p "⚠️  Environment variable $var is not set. Please enter value: " value
+            export $var=$value
+            echo "✅ Exported $var=$value"
+        else
+            echo "✅ Environment variable $var is already set."
+        fi
+    done
 }
 
 # Main loop to display menu and handle user input
 while true; do
+    check_packages
+    check_env_vars
     show_menu
     read -p "Select an option: " choice
 
@@ -79,11 +112,11 @@ while true; do
             increment_version major
             ;;
         7)
-            echo "Goodbye!"
+            echo "Goodbye! 👋"
             exit 0
             ;;
         *)
-            echo "Invalid option, please try again."
+            echo "❌ Invalid option, please try again."
             ;;
     esac
 
