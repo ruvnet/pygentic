@@ -1,9 +1,13 @@
-# connectors.toml
-[connectors.database]
-url = "sqlite:///./test.db"
+[connectors]
+    [connectors.database]
+    url = "sqlite:///./test.db"
+    
+    [connectors.llm_service]
+    model = "gpt-3.5-turbo"
+    
+    [connectors.serverless_service]
+    endpoint = "https://api.example.com/endpoint"
 
-[connectors.llm_service]
-model = "text-generation"
-
-[connectors.serverless_service]
-endpoint = "https://api.serverless.com"
+    # Add optional custom connector configurations here
+    #[connectors.mycustomconnector]
+    #custom_setting = "value"

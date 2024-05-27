@@ -27,6 +27,10 @@ Pygentic introduces the concept of agents—intelligent assistants that can perf
 
 Concurrency in Pygentic ensures that multiple tasks can be handled simultaneously without compromising performance. This is particularly important for applications requiring real-time responses or handling numerous requests at once. Pygentic's design leverages modern asynchronous programming techniques to manage these tasks efficiently, providing a smooth and responsive experience.
 
+### Plugin Connector System
+
+Pygentic's plugin connector system allows you to easily extend the core functionality by adding custom connectors without modifying the main codebase. This system uses a flexible configuration approach with TOML files, enabling you to define new connectors in separate Python files and dynamically load them into the application. This ensures seamless integration and easy updates while maintaining stability and performance.
+
 ### Serverless
 
 Pygentic supports serverless architectures, enabling you to deploy your AI applications without the need to manage infrastructure. This approach reduces operational complexity and costs, as the serverless platform handles scaling, monitoring, and resource allocation automatically. You can focus on developing and refining your AI capabilities, while the serverless environment ensures robust and scalable 
@@ -69,12 +73,15 @@ pygentic/
 │       ├── serverless_service.py
 │       ├── open_interpreter_service.py
 │       ├── database.py
+│       ├── plugin_loader.py
+│       ├── interfaces.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_assistants.py
 │   ├── test_threads.py
 │   ├── test_messages.py
 │   ├── test_runs.py
+├── connectors.toml
 ├── requirements.txt
 └── README.md
 ```
@@ -113,3 +120,105 @@ pygentic
 - `POST /v1/threads/{thread_id}/runs`: Run a thread with an assistant.
 - `GET /v1/threads/{thread_id}/runs/{run_id}`: Retrieve a run by ID.
  
+ ## TOML Configuration for Connectors
+
+Pygentic uses a TOML configuration file to define and manage connectors for various services. This approach enhances flexibility, speed, concurrency, and stability by centralizing the configuration in an easily readable and editable format.
+
+### Configuration Format
+
+Create a `connectors.toml` file in your project root with the following structure:
+
+```toml
+[connectors]
+    [connectors.database]
+    url = "sqlite:///./test.db"
+    
+    [connectors.llm_service]
+    model = "gpt-3.5-turbo"
+    
+    [connectors.serverless_service]
+    endpoint = "https://api.example.com/endpoint"
+
+## Parsing the Configuration File
+The Pygentic library automatically parses the connectors.toml file at startup. Ensure your configuration file is correctly formatted and placed in the root directory of your project.
+
+#Connector Classes
+Pygentic includes classes to manage connections to different services. These classes are initialized with the configurations from the connectors.toml file.
+
+- DatabaseConnector: Manages the connection to the database.
+- LLMServiceConnector: Manages the connection to the large language model service.
+- ServerlessServiceConnector: Manages the connection to a serverless endpoint.
+
+These connectors are used within the FastAPI middleware to make services available to your endpoints.
+
+## Creating Custom Connectors
+
+Pygentic's modular structure allows users to extend its functionality by creating custom connectors without modifying the core code. Follow these steps to create and use your custom connectors:
+
+### Define a Custom Connector
+
+Create a new file in your custom connectors directory (e.g., `custom_connectors/`) and define a class inheriting from `BaseConnector`.
+
+**Example:**
+
+```python
+from app.services.interfaces import BaseConnector
+
+class MyCustomConnector(BaseConnector):
+
+    def initialize(self, config: dict):
+        self.config = config
+        self.connected = False
+
+    async def connect(self):
+        self.connected = True
+
+    async def disconnect(self):
+        self.connected = False
+
+    async def generate_text(self, prompt: str) -> str:
+        if not self.connected:
+            await self.connect()
+        return "Generated text based on prompt: " + prompt
+```
+
+### Update Configuration
+Add your custom connector configuration to the connectors.toml file.
+
+Example
+```
+[connectors]
+    [connectors.database]
+    url = "sqlite:///./test.db"
+    
+    [connectors.llm_service]
+    model = "gpt-3.5-turbo"
+    
+    [connectors.serverless_service]
+    endpoint = "https://api.example.com/endpoint"
+
+    [connectors.mycustomconnector]
+    custom_setting = "value"
+
+```
+
+### Run the Application
+Set the environment variable PYGENTIC_PLUGIN_DIR to point to your custom connectors directory, and then run the Pygentic application
+
+```
+export PYGENTIC_PLUGIN_DIR=custom_connectors
+pygentic
+
+```
+Your custom connector methods can be accessed within your FastAPI endpoints via request.state.
+
+```
+@app.get("/custom_action")
+async def custom_action(request: Request):
+    result = await request.state.mycustomconnector.generate_text("Hello, Pygentic!")
+    return {"result": result}
+
+```
+
+By following these steps, you can extend Pygentic's functionality with custom connectors tailored to your specific needs without modifying the core library code.
+
