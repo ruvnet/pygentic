@@ -1,0 +1,9 @@
+# connectors.toml
+[connectors.database]
+url = "sqlite:///./test.db"
+
+[connectors.llm_service]
+model = "text-generation"
+
+[connectors.serverless_service]
+endpoint = "https://api.serverless.com"

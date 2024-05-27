@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="pygentic",
-    version="0.2.1",
+    version="0.2.2",
     packages=find_packages(),
     install_requires=[
         "fastapi",
@@ -19,6 +19,7 @@ setup(
         "databases[sqlite]",
         "pytest",
         "pytest-asyncio",
+        "sqlalchemy",  # Add any other dependencies here
     ],
     entry_points={
         "console_scripts": ["pygentic=app.main:run"],
@@ -35,7 +36,6 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Application Frameworks",
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

@@ -7,3 +7,5 @@ pydbantic
 databases[sqlite]
 pytest
 pytest-asyncio
+toml
+transformers
