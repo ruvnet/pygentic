@@ -138,7 +138,7 @@ Create a `connectors.toml` file in your project root with the following structur
     
     [connectors.serverless_service]
     endpoint = "https://api.example.com/endpoint"
-
+```
 ## Parsing the Configuration File
 The Pygentic library automatically parses the connectors.toml file at startup. Ensure your configuration file is correctly formatted and placed in the root directory of your project.
 
