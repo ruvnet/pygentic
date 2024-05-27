@@ -1,7 +1,6 @@
 from app.models import Assistant, Thread, Message, Run
 from liteLLM import LLMClient
 
-
 class LLMService:
     client = LLMClient(api_key="your_api_key")
 
