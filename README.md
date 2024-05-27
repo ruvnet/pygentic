@@ -141,21 +141,30 @@ Create a `connectors.toml` file in your project root with the following structur
 ```
 ## Parsing the Configuration File
 The Pygentic library automatically parses the connectors.toml file at startup. Ensure your configuration file is correctly formatted and placed in the root directory of your project.
+### Connectors in Pygentic
 
-#Connector Classes
-Pygentic includes classes to manage connections to different services. These classes are initialized with the configurations from the connectors.toml file.
+Pygentic's connectors provide a flexible and modular way to integrate various services into your AI applications. They abstract the complexities of interacting with different APIs, including the OpenAI Assistants API, allowing you to connect endpoints to various services without altering the core code. This section explains how connectors work and how you can create custom connectors.
 
-- DatabaseConnector: Manages the connection to the database.
-- LLMServiceConnector: Manages the connection to the large language model service.
-- ServerlessServiceConnector: Manages the connection to a serverless endpoint.
+### How Connectors Work
 
-These connectors are used within the FastAPI middleware to make services available to your endpoints.
+Connectors in Pygentic are designed to manage connections to various services such as databases, large language models (LLMs), and serverless endpoints. The default implementation includes an `OpenAIAssistantConnector` that interacts with the OpenAI Assistants API. However, you can easily create custom connectors to integrate other services.
 
-## Creating Custom Connectors
+#### Connector Classes
+
+Pygentic includes several built-in connector classes:
+
+- **DatabaseConnector**: Manages the connection to a database.
+- **LLMServiceConnector**: Manages the connection to a large language model service.
+- **ServerlessServiceConnector**: Manages the connection to a serverless endpoint.
+- **OpenAIAssistantConnector**: Connects to the OpenAI Assistants API to handle various assistant operations.
+
+These connectors are initialized with configurations from the `connectors.toml` file and used within FastAPI middleware to make services available to your endpoints.
+
+### Creating Custom Connectors
 
 Pygentic's modular structure allows users to extend its functionality by creating custom connectors without modifying the core code. Follow these steps to create and use your custom connectors:
 
-### Define a Custom Connector
+#### Define a Custom Connector
 
 Create a new file in your custom connectors directory (e.g., `custom_connectors/`) and define a class inheriting from `BaseConnector`.
 
@@ -182,43 +191,45 @@ class MyCustomConnector(BaseConnector):
         return "Generated text based on prompt: " + prompt
 ```
 
-### Update Configuration
-Add your custom connector configuration to the connectors.toml file.
+#### Update Configuration
 
-Example
-```
+Add your custom connector configuration to the `connectors.toml` file.
+
+**Example:**
+
+```toml
 [connectors]
     [connectors.database]
-    url = "sqlite:///./test.db"
+    url = "postgres://user:password@localhost/dbname"
     
     [connectors.llm_service]
-    model = "gpt-3.5-turbo"
+    model = "gpt-4"
     
     [connectors.serverless_service]
-    endpoint = "https://api.example.com/endpoint"
+    endpoint = "https://example.com/serverless"
 
     [connectors.mycustomconnector]
     custom_setting = "value"
-
 ```
 
-### Run the Application
-Set the environment variable PYGENTIC_PLUGIN_DIR to point to your custom connectors directory, and then run the Pygentic application
+#### Run the Application
 
-```
+Set the environment variable `PYGENTIC_PLUGIN_DIR` to point to your custom connectors directory, and then run the Pygentic application.
+
+```bash
 export PYGENTIC_PLUGIN_DIR=custom_connectors
 pygentic
-
 ```
-Your custom connector methods can be accessed within your FastAPI endpoints via request.state.
 
-```
+#### Access Custom Connector Methods
+
+Your custom connector methods can be accessed within your FastAPI endpoints via `request.state`.
+
+```python
 @app.get("/custom_action")
 async def custom_action(request: Request):
     result = await request.state.mycustomconnector.generate_text("Hello, Pygentic!")
     return {"result": result}
-
 ```
 
-By following these steps, you can extend Pygentic's functionality with custom connectors tailored to your specific needs without modifying the core library code.
-
+By following these steps, you can extend Pygentic's functionality with custom connectors tailored to your specific needs without modifying the core library code. This approach ensures that your integrations remain robust and adaptable to various services, providing a seamless and consistent API for your AI applications.
