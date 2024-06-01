@@ -107,6 +107,7 @@ pygentic
 ### Assistants
 - `POST /v1/assistants`: Create a new assistant.
 - `GET /v1/assistants/{assistant_id}`: Retrieve an assistant by ID.
+  - Note: The FastAPI UI now includes example JSON with test values for easier endpoint testing.
 
 ### Threads
 - `POST /v1/threads`: Create a new thread.
@@ -233,3 +234,21 @@ async def custom_action(request: Request):
 ```
 
 By following these steps, you can extend Pygentic's functionality with custom connectors tailored to your specific needs without modifying the core library code. This approach ensures that your integrations remain robust and adaptable to various services, providing a seamless and consistent API for your AI applications.
+
+## Configuring Database Connectors
+
+To switch the SQLite database to another persistence storage using the connectors system, modify the `connectors.toml` file in your project root. Below is an example configuration for a PostgreSQL setup:
+
+```toml
+[connectors]
+    [connectors.database]
+    url = "postgresql://user:password@localhost/dbname"
+    
+    [connectors.llm_service]
+    model = "gpt-3.5-turbo"
+    
+    [connectors.serverless_service]
+    endpoint = "https://api.example.com/endpoint"
+```
+
+This configuration demonstrates how to change the database connector from SQLite to PostgreSQL. Ensure that your PostgreSQL server is running and accessible at the specified URL.

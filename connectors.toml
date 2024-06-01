@@ -11,3 +11,7 @@
     # Add optional custom connector configurations here
     #[connectors.mycustomconnector]
     #custom_setting = "value"
+
+    # Example configuration for a PostgreSQL database
+    #[connectors.postgresql]
+    #url = "postgresql://user:password@localhost/dbname"
